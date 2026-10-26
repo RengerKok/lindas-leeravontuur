@@ -40,5 +40,5 @@ export function badges(reviews: Review[], sessions: StudySession[]) {
     { title: 'Superstudent', description: '7 dagen achter elkaar', earned: longest >= 7 }
   ];
 }
-export const motivations = ['Iedere vraag maakt je sterker.', 'Een kleine stap vandaag is vooruitgang voor morgen.', 'Je hoeft niet alles meteen te weten.', 'Geef jezelf de ruimte om te groeien.', 'Een foutje is gewoon een kans om te leren.', 'Jouw inzet telt, Linda.', 'Nieuwe kennis begint met nieuwsgierigheid.'];
+export const motivations = ['Je hoeft vandaag geen stadion te vullen. Een paar vragen is genoeg.', 'Pak een vraag, net als een kraal: eentje tegelijk.', 'Ook je lastigste hoofdstuk verdient nog een luisterbeurt.', 'Een korte leersessie past tussen twee favoriete albums.', 'Je hoeft de hele setlist nog niet uit je hoofd te kennen.', 'Applaus voor je inzet, Linda. De rest mag groeien.', 'Vandaag verzamel je kennis voor je volgende leer-era.'];
 export function dailyMotivation() { return motivations[Math.floor(Date.now() / 86400000) % motivations.length]; }

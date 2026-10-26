@@ -8,6 +8,10 @@ test('Excel, zelfbeoordeling, herhaling, hervatten en offline leren', async ({ p
   await page.getByLabel('Ik heb de koppelingen en voorbeelden gecontroleerd.').check();
   await page.getByRole('button', { name: '20 vragen toevoegen', exact: true }).click();
   await expect(page.getByRole('heading', { name: '20 vragen toegevoegd' })).toBeVisible();
+  await page.getByRole('button', { name: 'Mijn start', exact: true }).click();
+  await page.getByRole('button', { name: '20 Swiftie-vragen toevoegen', exact: true }).click();
+  await expect(page.getByText('Alle twintig Swiftie-vragen staan al in je collectie.')).toBeVisible();
+  await page.getByRole('button', { name: 'Toevoegen', exact: true }).click();
   await page.getByLabel('Excel of CSV kiezen').setInputFiles(sample);
   await expect(page.getByText('0 geldige vragen', { exact: true })).toBeVisible({ timeout: 30000 });
   await page.getByRole('button', { name: 'Leren', exact: true }).click(); await page.getByRole('button', { name: 'Begin met leren', exact: true }).click();
@@ -34,6 +38,30 @@ test('handmatig toevoegen, back-up exporteren en responsieve weergave', async ({
   await page.getByRole('button', { name: 'Lokaal', exact: true }).click();
   const downloaded = page.waitForEvent('download'); await page.getByRole('button', { name: 'Volledige back-up', exact: true }).click(); const download = await downloaded; expect(download.suggestedFilename()).toMatch(/linda-backup-.*\.json/);
   const excelDownloaded = page.waitForEvent('download'); await page.getByRole('button', { name: 'Excel exporteren', exact: true }).click(); expect((await excelDownloaded).suggestedFilename()).toMatch(/\.xlsx$/);
+});
+
+test('Swiftie-vragen en fan-thema op desktop en telefoon', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await expect(page.getByText('Taylor Swift fan-editie', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '20 Swiftie-vragen toevoegen', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Taylor Swift · Captions & albums', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Melding sluiten', exact: true }).click();
+  for (const viewport of [{ width: 1440, height: 1000 }, { width: 393, height: 852 }, { width: 320, height: 740 }]) {
+    await page.setViewportSize(viewport);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.locator('.welcome-art')).toBeVisible();
+    expect(await page.locator('.swiftie-mascot').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBe(512);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`swiftie-${viewport.width}.png`), fullPage: true, animations: 'disabled' });
+  }
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+  await page.screenshot({ path: testInfo.outputPath('swiftie-dark.png'), fullPage: true, animations: 'disabled' });
+  await page.getByRole('button', { name: 'Begin met leren', exact: true }).click();
+  await page.getByRole('button', { name: 'Begin met leren', exact: true }).click();
+  await expect(page.locator('.question-area h2')).toContainText('Bijschrift:');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Toon antwoord', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Goed!', exact: true })).toBeVisible();
 });
 
 function samplePdf() {
